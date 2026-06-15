@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G-DRAGON Surprise Player</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+body{background:#000;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
+.container{width:100%;max-width:500px;text-align:center;}
+.artist{font-size:16px;letter-spacing:6px;color:#999;margin-bottom:20px;}
+.song{font-size:34px;font-weight:700;margin-bottom:25px;min-height:80px;display:flex;align-items:center;justify-content:center;padding:0 20px;}
+.vinyl{width:280px;height:280px;margin:0 auto 25px;border-radius:50%;position:relative;cursor:pointer;
+background:repeating-radial-gradient(circle,#111 0,#222 3px,#111 6px,#000 10px);
+border:8px solid #333;animation:spin 4s linear infinite;animation-play-state:paused;}
+.vinyl.playing{animation-play-state:running;}
+.center-image{position:absolute;width:110px;height:110px;border-radius:50%;top:50%;left:50%;
+transform:translate(-50%,-50%);background-size:cover;background-position:center;border:4px solid #111;}
+.subtitle{color:#777;font-size:13px;letter-spacing:3px;margin-bottom:25px;}
+.random-btn{border:none;padding:18px 35px;border-radius:999px;cursor:pointer;font-size:16px;font-weight:700;background:white;color:black;}
+audio{display:none;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="artist">G-DRAGON</div>
+<div class="song" id="songName">🌼 SURPRISE ME</div>
+
+<div class="vinyl" id="vinyl">
+  <div class="center-image" id="centerImage"></div>
+</div>
+
+<div class="subtitle">SCAN • TAP • DISCOVER</div>
+<button class="random-btn" onclick="pickSong()">🌼 SURPRISE ME</button>
+<audio id="audioPlayer"></audio>
+</div>
+
+<script>
+const gdImages=["images/Gdragon1.jpg","images/Gdragon2.jpg"];
+const songs=[
+{title:"A Boy",file:"music/A_Boy-GDragon.mp3",images:["images/Heartbreaker1.jpg","images/Heartbreaker2.jpg"]},
+{title:"BLACK",file:"music/Black-GDragon.mp3",images:["images/Coup_d'Etat1.jpg","images/Coup_d'Etat2.jpg"]},
+{title:"Breathe",file:"music/Breathe-GDragon.mp3",images:["images/Heartbreaker1.jpg","images/Heartbreaker2.jpg"]},
+{title:"Bullshit",file:"music/Bullshit-GDragon.mp3",images:["images/Untitled,(2014)1.jpg","images/Untitled,(2014)2.jpg"]},
+{title:"COUP D'ETAT",file:"music/Coup_d'Etat-GDragon.mp3",images:["images/Coup_d'Etat1.jpg","images/Coup_d'Etat2.jpg"]},
+{title:"Crayon",file:"music/Crayon-GDragon.mp3",images:["images/OneOfAKind1.jpg","images/OneOfAKind2.jpg"]},
+{title:"CROOKED",file:"music/Crooked-GDragon.mp3",images:["images/Coup_d'Etat1.jpg","images/Coup_d'Etat2.jpg"]},
+{title:"Heartbreaker",file:"music/Heartbreaker-GDragon.mp3",images:["images/Heartbreaker1.jpg","images/Heartbreaker2.jpg"]},
+{title:"HOME SWEET HOME",file:"music/Home_Sweet_Home-GDragon.mp3",images:["images/ubermensch1.jpg","images/ubermensch2.png"]},
+{title:"Missing You",file:"music/Missing_You-GDragon.mp3",images:["images/OneOfAKind1.jpg","images/OneOfAKind2.jpg"]},
+{title:"One Of A Kind",file:"music/One_Of_A_Kind-GDragon.mp3",images:["images/OneOfAKind1.jpg","images/OneOfAKind2.jpg"]},
+{title:"POWER",file:"music/Power-GDragon.mp3",images:["images/Power1.jpg","images/Power2.jpg"]},
+{title:"R.O.D.",file:"music/R.O.D-GDragon.mp3",images:["images/Coup_d'Etat1.jpg","images/Coup_d'Etat2.jpg"]},
+{title:"That XX",file:"music/That_XX-GDragon.mp3",images:["images/OneOfAKind1.jpg","images/OneOfAKind2.jpg"]},
+{title:"Today",file:"music/Today-GDragon.mp3",images:["images/OneOfAKind1.jpg","images/OneOfAKind2.jpg"]},
+{title:"TOO BAD",file:"music/Too_Bad-GDragon.mp3",images:["images/ubermensch1.jpg","images/ubermensch2.png"]},
+{title:"Untitled, 2014",file:"music/Untitled,2014-GDragon.mp3",images:["images/Untitled,(2014)1.jpg","images/Untitled,(2014)2.jpg"]},
+{title:"WHO YOU?",file:"music/Who_You_-GDragon.mp3",images:["images/Coup_d'Etat1.jpg","images/Coup_d'Etat2.jpg"]},
+{title:"Window",file:"music/Window-GDragon.mp3",images:["images/Heartbreaker1.jpg","images/Heartbreaker2.jpg"]},
+{title:"Without You",file:"music/Without_You-GDragon.mp3",images:["images/OneOfAKind1.jpg","images/OneOfAKind2.jpg"]}
+];
+
+const player=document.getElementById("audioPlayer");
+const songName=document.getElementById("songName");
+const vinyl=document.getElementById("vinyl");
+const center=document.getElementById("centerImage");
+
+let currentSong=null, albumMode=true, imageIndex=0, imageTimer=null;
+
+function currentImages(){
+ return albumMode && currentSong ? currentSong.images : gdImages;
+}
+function updateImage(){
+ const imgs=currentImages();
+ center.style.backgroundImage=`url('${imgs[imageIndex]}')`;
+}
+function startImageRotation(){
+ clearInterval(imageTimer);
+ imageTimer=setInterval(()=>{
+   imageIndex=(imageIndex+1)%2;
+   updateImage();
+ },5000);
+}
+function toggleImage(){
+ imageIndex=(imageIndex+1)%2;
+ updateImage();
+}
+
+let holdTimer=null;
+vinyl.addEventListener("mousedown",()=>{
+ holdTimer=setTimeout(()=>{
+   albumMode=!albumMode;
+   imageIndex=0;
+   songName.innerText=albumMode?"💿 ALBUM MODE":"👑 G-DRAGON MODE";
+   updateImage();
+   setTimeout(()=>{
+      if(currentSong) songName.innerText=currentSong.title;
+   },2000);
+ },1000);
+});
+vinyl.addEventListener("mouseup",()=>clearTimeout(holdTimer));
+vinyl.addEventListener("mouseleave",()=>clearTimeout(holdTimer));
+vinyl.addEventListener("click",toggleImage);
+
+function pickSong(){
+ currentSong=songs[Math.floor(Math.random()*songs.length)];
+ imageIndex=0;
+ albumMode=true;
+ songName.innerText="🌼 Picking a surprise...";
+ player.src=currentSong.file;
+ player.load();
+ player.oncanplaythrough=()=>{
+   songName.innerText=currentSong.title;
+   updateImage();
+   startImageRotation();
+   player.play().catch(()=>{});
+ };
+}
+
+player.addEventListener("play",()=>vinyl.classList.add("playing"));
+player.addEventListener("pause",()=>vinyl.classList.remove("playing"));
+updateImage();
+</script>
+</body>
+</html>

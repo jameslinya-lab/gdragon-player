@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>G-DRAGON NFC Player</title>
+<title>G-DRAGON Surprise Player</title>
 
 <style>
 
@@ -75,6 +74,10 @@ box-shadow:
 0 0 30px rgba(255,255,255,.08);
 }
 
+.vinyl.paused{
+animation-play-state:paused;
+}
+
 .vinyl::before{
 content:"";
 position:absolute;
@@ -83,7 +86,6 @@ width:90px;
 height:90px;
 
 background:#111;
-
 border-radius:50%;
 
 top:50%;
@@ -147,7 +149,6 @@ transform:rotate(360deg);
 }
 
 </style>
-
 </head>
 
 <body>
@@ -159,17 +160,17 @@ G-DRAGON
 </div>
 
 <div class="song" id="songName">
-Tap Below
+🌼 SURPRISE ME
 </div>
 
-<div class="vinyl"></div>
+<div class="vinyl paused" id="vinyl"></div>
 
 <div class="subtitle">
-TODAY'S RANDOM PICK
+NFC RANDOM MUSIC EXPERIENCE
 </div>
 
 <button class="random-btn" onclick="pickSong()">
-🎲 PLAY RANDOM SONG
+🌼 SURPRISE ME
 </button>
 
 <audio id="audioPlayer"></audio>
@@ -177,8 +178,6 @@ TODAY'S RANDOM PICK
 </div>
 
 <script>
-
-let currentSong;
 
 const songs = [
 
@@ -205,29 +204,84 @@ const songs = [
 
 ];
 
-function pickSong(){
-
-currentSong =
-songs[Math.floor(Math.random() * songs.length)];
-
-document.getElementById("songName").innerText =
-currentSong.title;
-
 const player =
 document.getElementById("audioPlayer");
+
+const songName =
+document.getElementById("songName");
+
+const vinyl =
+document.getElementById("vinyl");
+
+let preloadAudio = null;
+
+function preloadNextSong(){
+
+const nextSong =
+songs[Math.floor(Math.random()*songs.length)];
+
+preloadAudio = new Audio();
+
+preloadAudio.preload = "auto";
+
+preloadAudio.src = nextSong.file;
+
+}
+
+function pickSong(){
+
+songName.innerText =
+"🌼 Picking a surprise...";
+
+const randomSong =
+songs[Math.floor(Math.random()*songs.length)];
 
 player.pause();
 
 player.src =
-currentSong.file;
+randomSong.file;
 
 player.load();
 
+player.addEventListener("canplaythrough", function ready(){
+
+songName.innerText =
+randomSong.title;
+
 player.play().catch(() => {
-console.log("Playback blocked");
+
+songName.innerText =
+"Tap Again To Play";
+
+});
+
+vinyl.classList.remove("paused");
+
+preloadNextSong();
+
+player.removeEventListener("canplaythrough", ready);
+
 });
 
 }
+
+player.addEventListener("ended", () => {
+
+vinyl.classList.add("paused");
+
+});
+
+player.addEventListener("pause", () => {
+
+vinyl.classList.add("paused");
+
+});
+
+player.addEventListener("play", () => {
+
+vinyl.classList.remove("paused");
+
+});
 
 </script>
 

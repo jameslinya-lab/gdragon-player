@@ -4,40 +4,182 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>G-DRAGON Surprise Player</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
-body{background:#000;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
-.container{width:100%;max-width:500px;text-align:center;}
-.artist{font-size:16px;letter-spacing:6px;color:#999;margin-bottom:20px;}
-.song{font-size:34px;font-weight:700;margin-bottom:25px;min-height:80px;display:flex;align-items:center;justify-content:center;padding:0 20px;}
-.vinyl{width:280px;height:280px;margin:0 auto 25px;border-radius:50%;position:relative;cursor:pointer;
-background:repeating-radial-gradient(circle,#111 0,#222 3px,#111 6px,#000 10px);
-border:8px solid #333;animation:spin 4s linear infinite;animation-play-state:paused;}
-.vinyl.playing{animation-play-state:running;}
-.center-image{position:absolute;width:110px;height:110px;border-radius:50%;top:50%;left:50%;
-transform:translate(-50%,-50%);background-size:cover;background-position:center;border:4px solid #111;}
-.subtitle{color:#777;font-size:13px;letter-spacing:3px;margin-bottom:25px;}
-.random-btn{border:none;padding:18px 35px;border-radius:999px;cursor:pointer;font-size:16px;font-weight:700;background:white;color:black;}
-audio{display:none;}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+body{
+  background:#000;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+}
+
+.container{
+  width:100%;
+  max-width:500px;
+  text-align:center;
+}
+
+.artist{
+  font-size:16px;
+  letter-spacing:6px;
+  color:#999;
+  margin-bottom:20px;
+}
+
+.song{
+  font-size:34px;
+  font-weight:700;
+  margin-bottom:25px;
+  min-height:80px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 20px;
+}
+
+.vinyl-wrapper{
+  width:280px;
+  height:280px;
+  margin:0 auto 25px;
+  position:relative;
+  cursor:pointer;
+}
+
+.vinyl{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  position:relative;
+  overflow:hidden;
+  animation:spin 4s linear infinite;
+  animation-play-state:paused;
+}
+
+.vinyl.playing{
+  animation-play-state:running;
+}
+
+.album-art{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background-size:cover;
+  background-position:center;
+}
+
+.grooves{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:
+  repeating-radial-gradient(
+    circle,
+    transparent 0,
+    transparent 3px,
+    rgba(0,0,0,.18) 4px,
+    rgba(0,0,0,.18) 5px
+  );
+  pointer-events:none;
+}
+
+.center-label{
+  position:absolute;
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background-size:cover;
+  background-position:center;
+  border:3px solid #111;
+  z-index:2;
+  box-shadow:0 0 0 2px #333;
+}
+
+.spindle{
+  position:absolute;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#111;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:3;
+  border:1px solid #666;
+}
+
+.subtitle{
+  color:#777;
+  font-size:13px;
+  letter-spacing:3px;
+  margin-bottom:25px;
+}
+
+.random-btn{
+  border:none;
+  padding:18px 35px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:700;
+  background:#fff;
+  color:#000;
+}
+
+audio{
+  display:none;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
 </style>
 </head>
+
 <body>
+
 <div class="container">
-<div class="artist">G-DRAGON</div>
-<div class="song" id="songName">🌼 SURPRISE ME</div>
 
-<div class="vinyl" id="vinyl">
-  <div class="center-image" id="centerImage"></div>
-</div>
+  <div class="artist">G-DRAGON</div>
 
-<div class="subtitle">SCAN • TAP • DISCOVER</div>
-<button class="random-btn" onclick="pickSong()">🌼 SURPRISE ME</button>
-<audio id="audioPlayer"></audio>
+  <div class="song" id="songName">🌼 SURPRISE ME</div>
+
+  <div class="vinyl-wrapper" id="vinylWrapper">
+    <div class="vinyl" id="vinyl">
+      <div class="album-art" id="albumArt"></div>
+      <div class="grooves"></div>
+      <div class="center-label" id="centerLabel"></div>
+      <div class="spindle"></div>
+    </div>
+  </div>
+
+  <div class="subtitle">SCAN • TAP • DISCOVER</div>
+
+  <button class="random-btn" onclick="surpriseMe()">🌼 SURPRISE ME</button>
+
+  <audio id="audioPlayer"></audio>
+
 </div>
 
 <script>
-const gdImages=["images/Gdragon1.jpg","images/Gdragon2.jpg"];
+const gdImages=[
+  "images/Gdragon1.jpg",
+  "images/Gdragon2.jpg"
+];
+
 const songs=[
 {title:"A Boy",file:"music/A_Boy-GDragon.mp3",images:["images/Heartbreaker1.jpg","images/Heartbreaker2.jpg"]},
 {title:"BLACK",file:"music/Black-GDragon.mp3",images:["images/Coup_d'Etat1.jpg","images/Coup_d'Etat2.jpg"]},
@@ -64,63 +206,220 @@ const songs=[
 const player=document.getElementById("audioPlayer");
 const songName=document.getElementById("songName");
 const vinyl=document.getElementById("vinyl");
-const center=document.getElementById("centerImage");
+const vinylWrapper=document.getElementById("vinylWrapper");
+const albumArt=document.getElementById("albumArt");
+const centerLabel=document.getElementById("centerLabel");
 
-let currentSong=null, albumMode=true, imageIndex=0, imageTimer=null;
+let currentSong=null;
+let albumMode=true;
+let imageIndex=0;
+let imageTimer=null;
+
+let playlist=[];
+let playlistIndex=0;
+let playlistStarted=false;
+
+function shuffle(array){
+  const arr=[...array];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function buildPlaylist(){
+  playlist=shuffle(songs);
+  playlistIndex=0;
+}
 
 function currentImages(){
- return albumMode && currentSong ? currentSong.images : gdImages;
+  return (albumMode && currentSong)
+    ? currentSong.images
+    : gdImages;
 }
+
 function updateImage(){
- const imgs=currentImages();
- center.style.backgroundImage=`url('${imgs[imageIndex]}')`;
+  const imgs=currentImages();
+
+  albumArt.style.backgroundImage=
+    `url('${imgs[imageIndex % imgs.length]}')`;
+
+  const labelImgs=currentSong
+    ? currentSong.images
+    : gdImages;
+
+  centerLabel.style.backgroundImage=
+    `url('${labelImgs[0]}')`;
 }
+
 function startImageRotation(){
- clearInterval(imageTimer);
- imageTimer=setInterval(()=>{
-   imageIndex=(imageIndex+1)%2;
-   updateImage();
- },5000);
+  clearInterval(imageTimer);
+
+  imageTimer=setInterval(()=>{
+    imageIndex=(imageIndex+1)%2;
+    updateImage();
+  },5000);
 }
+
 function toggleImage(){
- imageIndex=(imageIndex+1)%2;
- updateImage();
+  imageIndex=(imageIndex+1)%2;
+  updateImage();
 }
+
+function loadSong(song){
+
+  currentSong=song;
+  imageIndex=0;
+
+  songName.innerText="🌼 Loading...";
+
+  player.src=song.file;
+  player.load();
+
+  player.oncanplaythrough=()=>{
+    songName.innerText=song.title;
+
+    updateImage();
+    startImageRotation();
+
+    player.play().catch(()=>{});
+
+    player.oncanplaythrough=null;
+  };
+}
+
+function surpriseMe(){
+
+  if(!playlistStarted){
+    buildPlaylist();
+    playlistStarted=true;
+  }
+
+  albumMode=true;
+
+  loadSong(playlist[playlistIndex]);
+}
+
+player.addEventListener("ended",()=>{
+
+  if(!playlistStarted) return;
+
+  playlistIndex++;
+
+  if(playlistIndex>=playlist.length){
+    buildPlaylist();
+  }
+
+  loadSong(playlist[playlistIndex]);
+});
+
+player.addEventListener("play",()=>{
+  vinyl.classList.add("playing");
+});
+
+player.addEventListener("pause",()=>{
+  vinyl.classList.remove("playing");
+});
 
 let holdTimer=null;
-vinyl.addEventListener("mousedown",()=>{
- holdTimer=setTimeout(()=>{
-   albumMode=!albumMode;
-   imageIndex=0;
-   songName.innerText=albumMode?"💿 ALBUM MODE":"👑 G-DRAGON MODE";
-   updateImage();
-   setTimeout(()=>{
-      if(currentSong) songName.innerText=currentSong.title;
-   },2000);
- },1000);
-});
-vinyl.addEventListener("mouseup",()=>clearTimeout(holdTimer));
-vinyl.addEventListener("mouseleave",()=>clearTimeout(holdTimer));
-vinyl.addEventListener("click",toggleImage);
+let holdTriggered=false;
+let tapCount=0;
+let tapTimer=null;
 
-function pickSong(){
- currentSong=songs[Math.floor(Math.random()*songs.length)];
- imageIndex=0;
- albumMode=true;
- songName.innerText="🌼 Picking a surprise...";
- player.src=currentSong.file;
- player.load();
- player.oncanplaythrough=()=>{
-   songName.innerText=currentSong.title;
-   updateImage();
-   startImageRotation();
-   player.play().catch(()=>{});
- };
+function startHold(){
+
+  holdTriggered=false;
+
+  holdTimer=setTimeout(()=>{
+
+    holdTriggered=true;
+
+    albumMode=!albumMode;
+    imageIndex=0;
+
+    updateImage();
+
+    songName.innerText=
+      albumMode
+      ? "💿 ALBUM MODE"
+      : "👑 G-DRAGON MODE";
+
+    setTimeout(()=>{
+      if(currentSong){
+        songName.innerText=currentSong.title;
+      }
+    },2000);
+
+  },1000);
 }
 
-player.addEventListener("play",()=>vinyl.classList.add("playing"));
-player.addEventListener("pause",()=>vinyl.classList.remove("playing"));
+function stopHold(){
+  clearTimeout(holdTimer);
+}
+
+function handleTap(){
+
+  tapCount++;
+
+  clearTimeout(tapTimer);
+
+  tapTimer=setTimeout(()=>{
+
+    if(tapCount===1){
+
+      if(!currentSong) return;
+
+      if(player.paused){
+        player.play().catch(()=>{});
+      }else{
+        player.pause();
+      }
+
+    }else{
+
+      toggleImage();
+
+    }
+
+    tapCount=0;
+
+  },250);
+}
+
+vinylWrapper.addEventListener("mousedown",startHold);
+
+vinylWrapper.addEventListener("mouseup",()=>{
+  stopHold();
+
+  if(holdTriggered) return;
+
+  handleTap();
+});
+
+vinylWrapper.addEventListener("mouseleave",stopHold);
+
+vinylWrapper.addEventListener("touchstart",(e)=>{
+  e.preventDefault();
+  startHold();
+},{passive:false});
+
+vinylWrapper.addEventListener("touchend",(e)=>{
+  e.preventDefault();
+
+  stopHold();
+
+  if(holdTriggered) return;
+
+  handleTap();
+},{passive:false});
+
+vinylWrapper.addEventListener("touchmove",()=>{
+  stopHold();
+},{passive:true});
+
 updateImage();
 </script>
+
 </body>
 </html>
